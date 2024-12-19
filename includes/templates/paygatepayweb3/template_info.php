@@ -10,7 +10,7 @@
  */
 
 $template_name        = 'Paygate Template';
-$template_version     = 'Version 1.0.5';
+$template_version     = 'Version 1.0.6';
 $template_author      = 'App Inlet (Pty) Ltd';
 $template_description = 'Enable payment method selection on Paygate checkout';
 $template_screenshot  = 'scr_responsive_classic.jpg';

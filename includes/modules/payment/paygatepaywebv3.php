@@ -8,15 +8,15 @@
  */
 
 // ##################################################################################
-// Title                     : Paygate South Africa ZenCart Payment Module
-//                             Uses the PayWeb3 interface
-// Version                   : 1.0.5
+// Title                     : Paygate South Africa Zen Cart Payment Module
+//                             Uses the Paygate interface
+// Version                   : 1.0.6
 // Author                    : App Inlet (Pty) Ltd
-// Last modification date    : 2024-06
-// Notes                     : A payment module extension for ZenCart.
+// Last modification date    : 2024-12
+// Notes                     : A payment module extension for Zen Cart.
 //                             You will require a Paygate account to make use of this
 //                             module in a live environment.
-//                             Visit www.paygate.co.za for more info.
+//                             Visit https://payfast.io/solutions/gateway/ for more info.
 // ##################################################################################
 
 
@@ -166,9 +166,11 @@ class PaygatePaywebV3 extends Paygate
             $fields['NOTIFY_URL'] = $pgNotifyURL;
         }
 
-        $fields['USER3'] = 'zencart-v1.0.5';
+        $fields['USER3'] = 'zencart-v1.0.6';
 
-        $fields['CHECKSUM'] = md5(implode('', $fields) . ($this->testmode ? 'secret' : MODULE_PAYMENT_PAYGATEPAYWEB3_ENCRYPTIONKEY));
+        $fields['CHECKSUM'] = md5(
+            implode('', $fields) . ($this->testmode ? 'secret' : MODULE_PAYMENT_PAYGATEPAYWEB3_ENCRYPTIONKEY)
+        );
 
         $response = $this->curlPost('https://secure.paygate.co.za/payweb3/initiate.trans', $fields);
         parse_str($response, $fields);
@@ -237,13 +239,15 @@ class PaygatePaywebV3 extends Paygate
                 'PAY_REQUEST_ID' => filter_var($_POST['PAY_REQUEST_ID'], FILTER_SANITIZE_FULL_SPECIAL_CHARS),
                 'REFERENCE'      => filter_var($_GET['uuid'], FILTER_SANITIZE_FULL_SPECIAL_CHARS),
             );
-            $fields['CHECKSUM'] = md5(implode('', $fields) . ($this->testmode ? 'secret' : MODULE_PAYMENT_PAYGATEPAYWEB3_ENCRYPTIONKEY));
+            $fields['CHECKSUM'] = md5(
+                implode('', $fields) . ($this->testmode ? 'secret' : MODULE_PAYMENT_PAYGATEPAYWEB3_ENCRYPTIONKEY)
+            );
             $response           = $this->curlPost('https://secure.paygate.co.za/payweb3/query.trans', $fields);
             parse_str($response, $fields);
         }
         $GLOBALS['PAY_REQUEST_ID'] = $fields['PAY_REQUEST_ID'];
 
-        if ($fields['ERROR']) {
+        if (isset($fields['ERROR']) && $fields['ERROR']) {
             $GLOBALS['PAYGATE_ERROR'] = $fields['ERROR'];
             zen_redirect(
                 zen_href_link('declined_transaction', 'status=10&error=' . $fields['ERROR'], 'SSL', true, false)
@@ -271,7 +275,7 @@ class PaygatePaywebV3 extends Paygate
                 zen_redirect(
                     zen_href_link(
                         FILENAME_CHECKOUT_PAYMENT,
-                        'error_message=' . urlencode('User cancelled transaction, ' . $fields['ERROR']),
+                        'error_message=' . urlencode('User cancelled transaction, ' . $fields['RESULT_DESC']),
                         'SSL',
                         true,
                         false
@@ -513,7 +517,6 @@ class PaygatePaywebV3 extends Paygate
 }
 
 if (!class_exists('base')) {
-
     class base
     {
         // Fallback if base class unknown
